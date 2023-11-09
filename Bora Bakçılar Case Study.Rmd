@@ -1,0 +1,918 @@
+---
+title: "Invent Analytics Case Study Report"
+author: "Bora Bakçılar"
+date: "2023-07-22"
+output:
+  pdf_document: default
+  word_document: default
+  html_document:
+    df_print: paged
+---
+```{r libs, message=FALSE, warning=FALSE, include=FALSE, paged.print=FALSE}
+if (!require(readr)) install.packages("readr") ; library(readr)
+if (!require(ggplot2)) install.packages("ggplot2") ; library(ggplot2)
+if (!require(dplyr)) install.packages("dplyr") ; library(dplyr)
+if (!require(lubridate)) install.packages("lubridate") ; library(lubridate)
+if (!require(cluster)) install.packages("cluster") ; library(cluster)
+if (!require(tidyr)) install.packages("tidyr") ; library(tidyr)
+if (!require(mclust)) install.packages("mclust") ; library(mclust)
+if (!require(stats)) install.packages("stats") ; library(stats)
+if (!require(caret)) install.packages("caret") ; library(caret)
+if (!require(rpart)) install.packages("rpart") ; library(rpart)
+if (!require(gbm)) install.packages("gbm") ; library(gbm)
+if (!require(imager)) install.packages("imager") ; library(imager)
+if (!require(png)) install.packages("png") ; library(png)
+
+```
+
+
+### Aim To Study
+
+In this study, various statistical approaches, including Gaussian Mixture Model (GMM), linear regression, two-sample t-test, and the Gradient Boosting Machine algorithm, were utilized to evaluate the impact of promotional periods on product and store performances.
+
+
+### Classification of Products
+
+I used Gaussian Mixture Model to classify products into three categories: Fast, Medium, and Slow. If we need more detailed classification, we can increase the number of classes to achieve a more refined model. I evaluated each product based on their total sales counts between 2015-01-01 and 2015-07-31. The results showed that during this period, we have 12 products classified as Fast, 235 products as Medium, and 70 products as Slow.
+
+
+
+### Classification Of Stores 
+
+In this study, I used Gaussian Mixture Model (GMM) to categorize stores into three groups: High-Performing, Moderate-Performing, and Low-Performing. If a more detailed analysis is required, we can increase the number of classes to obtain a more nuanced model. The evaluation of each store was based on their total sales figures between January 1, 2015, and July 31, 2015. The results revealed that during this period, we have 13 stores classified as High-Performing, 226 stores as Moderate-Performing, and 101 stores as Low-Performing
+
+### İmpact Of Promotion 
+
+When comparing the promotional and non-promotional periods, I observed the effects of promotions on both product and store levels, considering both unit and percentage changes in sales over an 8-day period before the promotions were implemented.
+
+During the promotional period, product number 162 achieved the highest percentage increase in sales with a remarkable 44,475% rise. On the other hand, product number 218 showed the most significant unit increase in sales between the promotional and non-promotional periods, with a remarkable boost of 18,745 units over the 8-day period.
+
+Similarly, when analyzing the data at the store level, store number 44 demonstrated the highest percentage increase in sales with an impressive 9,650%. Meanwhile, store number 331 exhibited the most substantial increase in the number of products sold, with an astonishing rise of 2,251 units.
+
+These findings shed light on the significant impact of promotions on specific products and stores, both in terms of percentage and unit changes, thereby highlighting the effectiveness of promotions in boosting sales during the specified 8-day period.
+
+
+### Hypothesis Testings
+
+\(\mu_0 =\) mean of weekdays
+
+\(\mu_1 =\) mean of weekends
+
+First, I aimed to evaluate the factors that influence the promotional period, focusing on weekends and weekdays. When formulating our hypothesis, I considered \( H_0 : \mu_0 = \mu_1 \) and \( H_1 : \mu_0 < \mu_1 \). According to the test result, the p-value was calculated as \( p = 1.313 \times 10^{-10} \). This implies that H0 is rejected. Therefore, during the promotional period, weekends show significantly higher average sales performance compared to weekdays.
+
+#### Promotion Effects Of Products And Stores                                                                         
+
+\(\mu_0 =\) mean of non-promotion. 
+\(\mu_1 =\) mean of promotions
+
+I analyzed the daily sales during the promotional and non-promotional periods, focusing on fast and slow products, as well as stores, to examine whether promotions have a positive effect on these categories. The hypothesis tests were conducted with the hypotheses \(H_0 : \mu_0 = \mu_1\) and \(H_1 : \mu_0 < \mu_1\).
+
+When comparing the daily sales averages of fast products between the non-promotional and promotional periods using a t-test at a 95% confidence interval, I found that \(p = 0.1361\). Since we cannot reject H0 at this confidence interval, we need to decrease the confidence level to 86% to reject H0. Therefore, it can be observed within the utilized confidence interval that promotions do not significantly increase the sales quantity of fast products.
+
+On the other hand, applying the same process to slow products resulted in a \(p = 0.0033\) at a 95% confidence interval. This indicates that H0 is rejected, suggesting that promotions lead to increased sales quantity for slow products.
+
+Moving on to fast and slow stores, I formed the same hypothesis and compared the daily total sales averages of stores between the promotional and non-promotional periods.
+
+For fast stores, the hypothesis test yielded \(p = 0.0002271\). Consequently, H0 is rejected, indicating that promotions have a noticeable impact on increasing the average daily sales for fast stores.
+
+Regarding slow stores, the applied hypothesis test resulted in \(p = 1.941 \times 10^{-8}\). This implies that promotions also increase the daily sales quantity for slow stores.
+
+In conclusion, our hypothesis testing shows that promotions have a positive effect on the sales quantities of slow products and both fast and slow stores. However, for fast products, this effect is not significant within the tested confidence intervals.
+
+
+### Conclusion
+
+In this study, I aimed to evaluate the impact of promotions on product and store performances using various statistical approaches. First, I categorized products into three groups (Fast, Medium, and Slow) and stores into three groups (High-Performing, Moderate-Performing, and Low-Performing) using Gaussian Mixture Model (GMM). This classification allowed us to have a more nuanced understanding of the product and store characteristics.
+
+I then compared the sales performance during promotional and non-promotional periods for both products and stores. The results revealed that promotions have a significant positive impact on slow products and both fast and slow stores. However, for fast products, the observed effect was not statistically significant within the tested confidence intervals.
+
+Additionally, I conducted hypothesis tests to assess the influence of promotions on weekends and weekdays. The tests indicated that promotions significantly increase sales performance during weekends compared to weekdays, implying the effectiveness of promotions in boosting weekend sales.
+
+In conclusion, promotions have proved to be effective in enhancing sales for specific product categories and stores, particularly slow products and both fast and slow stores. Understanding these effects can help businesses make informed decisions when planning promotional strategies to optimize sales performance. However, further analysis and fine-tuning of promotional strategies for fast products might be required to achieve a statistically significant impact on sales. Overall, this study provides valuable insights into the dynamics of promotions and their influence on product and store performances.
+
+## MODELS
+
+### MODEL1:
+Model 1 is a linear regression-based learning algorithm based on promo1, promo2, promo3, and promo4 dates. Using data from these four promotional periods, the model initially produces a low but acceptable R-squared value (0.1646) and RMSE (5.426) for predictions.
+
+The R-squared value indicates that the model explains only about 16.46% of the variance in the dependent variable. This suggests that the model can only moderately predict changes in sales quantity with the current independent variables. The RMSE, on the other hand, reflects an average deviation of approximately 5.426 units between the model's predictions and the actual values. Lower RMSE values imply better prediction performance, although the initial value for this model is considered acceptable.
+
+The SSRES (Sum of Squared Residuals) value represents how well the model fits the actual data. It corresponds to a sum of squared errors of 1,219,087 units, indicating that the model cannot fully explain the data.
+
+To improve Model 1's prediction performance, we can enhance our variables and conduct different analyses. For instance, we can introduce separate variables for weekends and weekdays during model training. Additionally, we can incorporate factors like "Fast," "Medium," and "Slow" to represent sales pace as additional features. By thoughtfully evaluating these additional parameters, we can construct a more sophisticated model that refines predictions within acceptable limits.
+
+By applying these development methods, we can enhance Model1 and transform it into a more accurate predictive model. Paying close attention to variable selection, transformations, and incorporating additional factors can substantially contribute to improved outcomes. As a result, we can gain better insights into sales trends and achieve more precise predictions for future scenarios.
+
+
+### MODEL 2:
+
+Model 2 has proven to be more acceptable and successful compared to Model 1. I utilized the Gradient Boosting Machine algorithm, which yielded better results compared to the linear regression model used in Model 1, achieving a predictive accuracy of 47%.
+In this approach, I trained a daily-based model using data from promo1, promo2, promo3, and promo4 dates, and used this model to predict daily sales quantities for the promo5 dates. To obtain the predicted total sales quantity for the 6-day promo5 period, I aggregated the daily predictions. Subsequently, I evaluated the performance of Model 2 using metrics such as R-squared, RMSE, SSRES, and likelihood, resulting in R^2 value of 0.47, RMSE of 6.98, SSRES of 1325442, and AIC of 105690.
+Based on the R^2 value, I can infer that Model 2 provided more accurate predictions compared to Model 1. However, to further enhance Model 2's acceptability, I can follow the same approach as described in improving Model 1 by incorporating additional parameters and refining the model to reduce prediction errors.
+In conclusion, Model 2 outperformed Model 1, and by incorporating more sophisticated model improvements as discussed previously, we can make Model 2 even more reliable and effective in predicting sales outcomes.
+
+By further improving Model 2 and enhancing its predictive power, we can efficiently determine the required workforce during promotional periods in our stores. This will enable us to optimize labor planning, ensuring we have the right number of employees to handle the increased customer flow during promotions. Additionally, with more accurate sales forecasts, we can optimize inventory management and ensure that adequate stock levels are maintained, avoiding both stockouts and overstocking situations. This will help us reduce carrying costs and minimize potential losses due to inventory spoilage.
+Moreover, utilizing the improved model to predict sales quantities can also benefit our production and logistics operations. With more accurate forecasts, we can better plan the production frequency of goods, aligning it with the actual demand during promotional periods. This will help us avoid excessive production costs and reduce wastage. Additionally, precise sales predictions can assist in optimizing our logistics operations, allowing us to plan transportation and distribution more efficiently, thereby reducing transportation costs and improving overall supply chain efficiency.
+Ultimately, by utilizing the enhanced predictive model, we can increase the overall efficiency and productivity of our stores, while also minimizing operational expenses. This strategic approach will
+contribute to maximizing profits and ensuring the successful performance of our business during promotional periods and beyond.
+
+
+
+
+
+## Bonnus 
+
+I performed a t-test on two new datasets, one for the 7 days before the promotion and the other for the 7 days after the promotion, focusing on negative SalesQuantity values (returns). The obtained p-value was less than 0.028, indicating a statistically significant difference. This suggests that after the promotion, there was an increase in product returns.
+
+
+# CODES
+
+
+
+## Part A&B
+
+Importing data for task 1 
+```{r importing data, message=FALSE, warning=FALSE, include=FALSE, paged.print=FALSE}
+my_data_task1 <- read_csv("~/Desktop/case study İnvest Analytic/assignment4.1a.csv")
+my_second_task <- read_csv("~/Desktop/case study İnvest Analytic/assignment4.1b.csv")
+
+```
+
+### Creating Promotion term for Part A 
+
+```{r Creating Promotion(1-4), echo=FALSE, message=FALSE, warning=FALSE}
+my_data_task1$Date <- as.Date(my_data_task1$Date, format = "%Y%m%d")
+
+promo1_start <- as.Date("2015-2-10")
+promo1_finish <- as.Date("2015-2-17")
+
+promo2_start <- as.Date("2015-3-15")
+promo2_finish <- as.Date("2015-3-22")
+
+promo3_start <- as.Date("2015-5-24")
+promo3_finish <- as.Date("2015-6-1")
+
+promo4_start <- as.Date("2015-06-21")
+promo4_finish <- as.Date("2015-06-28")
+
+promo1 <- my_data_task1 %>% 
+  filter(Date >= promo1_start & Date <= promo1_finish)
+
+promo2 <- my_data_task1 %>%
+  filter(Date >= promo2_start & Date <= promo2_finish)
+
+promo3 <- my_data_task1 %>% 
+  filter(Date >= promo3_start & Date <= promo3_finish)
+
+promo4 <- my_data_task1 %>% 
+  filter(Date >= promo4_start & Date <= promo4_finish)
+
+promotions <- rbind(promo1,promo2,promo3,promo4)
+
+my_data_wo_promo <- my_data_task1 %>% 
+  filter(!(Date >= promo1_start & Date <= promo1_finish) & !(Date >= promo2_start & Date <= promo2_finish) &
+           !(Date >= promo3_start & Date <= promo3_finish) & !(Date >= promo4_start & Date <= promo4_finish))
+```
+
+### A
+
+#### Whole term
+
+I used the GMM method here. I used GMM because I believed that it would give better results because it learned the GMM method directly from the data and determined the cluster centers itself. When using it, I stated that I want 3 clusters.
+
+
+```{r echo=TRUE, message=FALSE, warning=FALSE}
+Total_sale_Product <- my_data_task1 %>%
+  group_by(ProductCode) %>%
+  summarise(Total_Sale = sum(SalesQuantity))
+
+ggplot(Total_sale_Product, aes(x = Total_Sale)) +
+  geom_density(alpha = 0.7) +
+  labs(title = "Total Sales Quantity of Products' Density Graph",
+       x = "Total Sales Quantity",
+       y = "Density")
+
+
+data_for_clustering_product <- Total_sale_Product$Total_Sale
+
+gmm_result_product <- Mclust(data_for_clustering_product, G = 3)
+
+cluster_labels_product <- gmm_result_product$classification
+
+Total_sale_Product$Cluster_Label <- cluster_labels_product
+
+cluster_means_product <- Total_sale_Product %>%
+  group_by(Cluster_Label) %>%
+  summarise(Avg_Total_Sale = mean(Total_Sale))
+
+threshold_fast_product <- cluster_means_product$Avg_Total_Sale[3]
+threshold_slow_product <- cluster_means_product$Avg_Total_Sale[1]
+
+Total_sale_Product$Product_Category <- ifelse(Total_sale_Product$Total_Sale >= threshold_fast_product, "Fast Product",
+                                               ifelse(Total_sale_Product$Total_Sale >= threshold_slow_product, "Medium Product", "Slow Product"))
+
+print(Total_sale_Product)
+
+
+ggplot(data = Total_sale_Product, aes(x = Product_Category, fill = Product_Category)) +
+  geom_bar() +
+  labs(title = "Cluster Distribution",
+       x = "Product Category",
+       y = "Number of Product") +
+  geom_text(stat='count', aes(label=..count..), vjust=-0.3)
+
+```
+
+#### Weekly 
+
+I used the GMM method to classify the products on a weekly basis.
+```{r message=FALSE, warning=FALSE}
+weekly_sale_Product <- my_data_task1 %>%
+  group_by(ProductCode, Date =cut(Date, breaks = "7 days")) %>%
+  summarise(Weekly_Sale_Quantity = sum(SalesQuantity))
+
+ggplot(weekly_sale_Product, aes(x = Weekly_Sale_Quantity)) +
+  geom_density(alpha = 0.7) +
+  labs(title = "Weekly Sales Amounts of Products Density Graph",
+       x = "Weekly Sales Quantity",
+       y = "Density")
+
+
+data_for_clustering_product <- weekly_sale_Product$Weekly_Sale_Quantity
+
+gmm_result_product <- Mclust(data_for_clustering_product,G = 3 )
+
+cluster_labels_product <- gmm_result_product$classification
+
+weekly_sale_Product$Cluster_Label <- cluster_labels_product
+
+cluster_means_product <- weekly_sale_Product %>%
+  group_by(Cluster_Label) %>%
+  summarise(Avg_Weekly_Sale_Quantity = mean(Weekly_Sale_Quantity))
+
+print(cluster_means_product$Avg_Weekly_Sale_Quantity)
+threshold_fast_product <- cluster_means_product$Avg_Weekly_Sale_Quantity[3]
+threshold_slow_product <- cluster_means_product$Avg_Weekly_Sale_Quantity[1]
+
+weekly_sale_Product$Product_Category <- ifelse(weekly_sale_Product$Weekly_Sale_Quantity >= threshold_fast_product, "Fast Product",
+                                               ifelse(weekly_sale_Product$Weekly_Sale_Quantity >= threshold_slow_product, "Medium Product", "Slow Product"))
+
+print(weekly_sale_Product)
+
+
+ggplot(data = weekly_sale_Product, aes(x = Product_Category, fill = Product_Category)) +
+  geom_bar() +
+  labs(title = "Cluster Distribution",
+       x = "Product Category",
+       y = "Quantity of Product") +
+  geom_text(stat='count', aes(label=..count..), vjust=-0.3)
+
+
+```
+### B
+
+#### Whole term
+
+Again, I used the GMM method to classify the products for the whole period.
+
+```{r echo=TRUE, message=FALSE, warning=FALSE}
+Total_sale_Store <- my_data_task1 %>%
+  group_by(StoreCode) %>%
+  summarise(Total_Sale = sum(SalesQuantity))
+
+
+ggplot(Total_sale_Store, aes(x =Total_Sale)) +
+  geom_density(alpha = 0.7) +
+  labs(title = "Density graph by total sales of stores",
+       x = "Total Sales Quantity",
+       y = " Density ")
+
+data_for_clustering_store <- Total_sale_Store$Total_Sale
+
+gmm_result <- Mclust(data_for_clustering_store, G = 3)
+
+cluster_labels_store <- gmm_result$classification
+
+Total_sale_Store$Cluster_Label <- cluster_labels_store
+
+cluster_means_store <- Total_sale_Store %>%
+  group_by(Cluster_Label) %>%
+  summarise(Avg_Total_Sale = mean(Total_Sale))
+
+threshold_slow_store <- cluster_means_store$Avg_Total_Sale[1]
+threshold_fast_store <- cluster_means_store$Avg_Total_Sale[3]
+
+Total_sale_Store$Category <- ifelse(Total_sale_Store$Total_Sale >= threshold_fast_store, "Fast Store",
+                                     ifelse(Total_sale_Store$Total_Sale >= threshold_slow_store, "Medium Store", "Slow Store"))
+
+print(Total_sale_Store)
+
+ggplot(data = Total_sale_Store, aes(x = Category, fill = Category)) +
+  geom_bar() +
+  labs(title = "Cluster Distribution",
+       x = "Category",
+       y = "Number of Stores") +
+  geom_text(stat='count', aes(label=..count..), vjust=-0.3)  
+```
+
+
+#### Weekly 
+
+ I used the GMM method again to see which store was fast, slow or medium on a weekly basis during the whole period.
+
+
+```{r echo=TRUE, message=FALSE, warning=FALSE}
+
+weekly_sale_Store <- my_data_task1 %>%
+  group_by(StoreCode, Date = cut(Date, breaks = "8 days")) %>%
+  summarise(Weekly_Sale_Quantity = sum(SalesQuantity))
+
+ggplot(weekly_sale_Store, aes(x = Weekly_Sale_Quantity)) +
+  geom_density(alpha = 0.7) +
+  labs(title = "Weekly Sales Quantity Density Graph of the stores",
+       x = "Weekly Sales Quantity",
+       y = " Density ")
+
+data_for_clustering_store <- weekly_sale_Store$Weekly_Sale_Quantity
+
+
+gmm_result <- Mclust(data_for_clustering_store,G=3)
+
+
+cluster_labels_store <- gmm_result$classification
+
+weekly_sale_Store$Cluster_Label <- cluster_labels_store
+
+cluster_means_store <- weekly_sale_Store %>%
+  group_by(Cluster_Label) %>%
+  summarise(Avg_Weekly_Sale_Quantity = mean(Weekly_Sale_Quantity))
+
+threshold_slow_store <- cluster_means_store$Avg_Weekly_Sale_Quantity[1]
+threshold_fast_store <- cluster_means_store$Avg_Weekly_Sale_Quantity[3]
+
+weekly_sale_Store$Category <- ifelse(weekly_sale_Store$Weekly_Sale_Quantity >= threshold_fast_store, "Fast Store",
+                                     ifelse(weekly_sale_Store$Weekly_Sale_Quantity >= threshold_slow_store, "Medium Store", "Slow Store"))
+
+print(weekly_sale_Store)
+
+ggplot(data = weekly_sale_Store, aes(x = Category, fill = Category)) +
+  geom_bar() +
+  labs(title = "Cluster Distribution",
+       x = "Category",
+       y = "Number of Stores") +
+  geom_text(stat='count', aes(label=..count..), vjust=-0.3)  
+
+
+```
+
+### C 
+```{r}
+# First, let's organize the pre-promotional period data (we could have done different approaches here, for example, going from the sales averages of the non-promotional and promotional periods)
+before1_start<- as.Date("2015-2-3")
+before1_finish <- as.Date("2015-2-9")
+
+before2_start <- as.Date("2015-3-7")
+before2_finish <- as.Date("2015-3-14")
+
+before3_start <- as.Date("2015-5-16")
+before3_finish <- as.Date("2015-5-23")
+
+before4_start <- as.Date("2015-06-13")
+before4_finish <- as.Date("2015-06-20")
+
+before1 <- my_data_task1 %>% 
+  filter(Date >= before1_start & Date <= before1_finish)
+
+before2 <- my_data_task1 %>%
+  filter(Date >= before2_start & Date <= before2_finish)
+
+before3 <- my_data_task1 %>% 
+  filter(Date >= before3_start & Date <= before3_finish)
+
+before4 <- my_data_task1 %>% 
+  filter(Date >= before4_start & Date <= before4_finish)
+
+before_promotion_week <- my_data_task1 %>%
+  filter(Date >= before1_start & Date <= before1_finish |
+         Date >= before2_start & Date <= before2_finish |
+         Date >= before3_start & Date <= before3_finish |
+         Date >= before4_start & Date <= before4_finish) %>%
+  group_by(ProductCode, Date = cut(Date, breaks = "8 days", include.lowest = TRUE)) %>%
+  summarise(Weekly_Sale_Quantity = sum(SalesQuantity))
+
+promotions <- my_data_task1 %>%
+  filter(Date >= promo1_start & Date <= promo1_finish |
+         Date >= promo2_start & Date <= promo2_finish |
+         Date >= promo3_start & Date <= promo3_finish |
+         Date >= promo4_start & Date <= promo4_finish) %>%
+  group_by(ProductCode, Date = cut(Date, breaks = "8 days", include.lowest = TRUE)) %>%
+  summarise(Weekly_Sale_Quantity = sum(SalesQuantity))
+
+combined_data <- rbind(before_promotion_week, promotions)
+
+change_data <- combined_data %>%
+  group_by(ProductCode) %>%
+  mutate(Next_Week_Sale_Quantity = lead(Weekly_Sale_Quantity),
+         Percentage_Change = ifelse(is.na(Next_Week_Sale_Quantity) | Weekly_Sale_Quantity == 0, 0, 
+                            ((Next_Week_Sale_Quantity - Weekly_Sale_Quantity) / Weekly_Sale_Quantity) * 100),
+         Change = Next_Week_Sale_Quantity - Weekly_Sale_Quantity )
+
+print(change_data[which.max(change_data$Percentage_Change), ])
+print(change_data[which.max(change_data$Change),])
+
+
+```
+
+### D
+
+
+```{r message=FALSE, warning=FALSE}
+# First, let's organize the pre-promotional period data (we could have done different approaches here, for example, going from the sales averages of the non-promotional and promotional periods)
+
+before_promotion_week <- my_data_task1 %>%
+  filter(Date >= before1_start & Date <= before1_finish |
+         Date >= before2_start & Date <= before2_finish |
+         Date >= before3_start & Date <= before3_finish |
+         Date >= before4_start & Date <= before4_finish) %>%
+  group_by(StoreCode, Date = cut(Date, breaks = "8 days", include.lowest = TRUE)) %>%
+  summarise(Weekly_Sale_Quantity = sum(SalesQuantity))
+
+promotions <- my_data_task1 %>%
+  filter(Date >= promo1_start & Date <= promo1_finish |
+         Date >= promo2_start & Date <= promo2_finish |
+         Date >= promo3_start & Date <= promo3_finish |
+         Date >= promo4_start & Date <= promo4_finish) %>%
+  group_by(StoreCode, Date = cut(Date, breaks = "8 days", include.lowest = TRUE)) %>%
+  summarise(Weekly_Sale_Quantity = sum(SalesQuantity))
+
+combined_data <- rbind(before_promotion_week, promotions)
+
+change_data <- combined_data %>%
+  group_by(StoreCode) %>%
+  mutate(Next_Week_Sale_Quantity = lead(Weekly_Sale_Quantity),
+         Percentage_Change = ifelse(is.na(Next_Week_Sale_Quantity) | Weekly_Sale_Quantity == 0, 0, 
+                            ((Next_Week_Sale_Quantity - Weekly_Sale_Quantity) / Weekly_Sale_Quantity) * 100),
+         Change = Next_Week_Sale_Quantity - Weekly_Sale_Quantity )
+
+print(change_data[which.max(change_data$Percentage_Change), ])
+print(change_data[which.max(change_data$Change),])
+
+```
+
+### E
+
+
+```{r}
+promotions <- rbind(promo1,promo2,promo3,promo4)
+my_data_task1$weekday <- weekdays(my_data_task1$Date)
+
+weekday_sales <- my_data_task1 %>%
+  filter(weekday %in% c("Monday", "Tuesday", "Wednesday", "Thursday", "Friday")) %>%
+  group_by(Date) %>%
+  summarize(daily_sales_weekday = mean(SalesQuantity))
+
+weekend_sales <- my_data_task1 %>%
+  filter(weekday %in% c("Saturday", "Sunday")) %>%
+  group_by(Date) %>%
+  summarize(daily_sales_weekend = mean(SalesQuantity))
+
+t_test_result <- t.test(weekday_sales$daily_sales_weekday, weekend_sales$daily_sales_weekend)
+
+if(t_test_result$p.value < 0.5) {
+  cat("Within this confidence interval, we REJECT the null hypothesis. This means that there is a statistically significant increase in the sales quantity of fast products during the promotional period on weekends. ")
+  
+}else cat("Within this confidence interval, we CAN NOT reject the null hypothesis. This means that there is no statistically significant difference in the sales quantity of fast products between weekends and weekdays during the promotional period.")
+```
+
+### F
+
+Here, we need to take the products during the promotion times and create a new era.
+After creating this, we t-test the fast and slow products according to their non-promotional and promotional times.
+we examine whether the promotion has an effect, we test it at the 95% confidence interval based on our p value.
+
+```{r message=FALSE, warning=FALSE}
+
+
+promotions <- rbind(promo1, promo2, promo3, promo4) #Verimizi daha önce değiştirdiğimiz için tekrar çağırdık
+
+Total_sale_Product_prom <- promotions %>%
+  group_by(ProductCode) %>%
+  summarise(Total_Sale = sum(SalesQuantity))
+
+
+data_for_clustering_product <- Total_sale_Product_prom$Total_Sale
+
+
+gmm_result_product <- Mclust(data_for_clustering_product, G = 3)
+
+cluster_labels_product <- gmm_result_product$classification
+
+Total_sale_Product_prom$Cluster_Label <- cluster_labels_product
+
+cluster_means_product <- Total_sale_Product_prom %>%
+  group_by(Cluster_Label) %>%
+  summarise(Avg_Total_Sale = mean(Total_Sale))
+
+threshold_fast_product <- cluster_means_product$Avg_Total_Sale[3]
+threshold_slow_product <- cluster_means_product$Avg_Total_Sale[1]
+
+Total_sale_Product_prom$Product_Category <- ifelse(Total_sale_Product_prom$Total_Sale >= threshold_fast_product, "Fast Product",
+                                               ifelse(Total_sale_Product_prom$Total_Sale >= threshold_slow_product, "Medium Product", "Slow Product"))
+
+
+# Lets observe the with out promotions after we can use Hypothesis test 
+
+Total_sale_wo_promo_product <- my_data_wo_promo %>%
+  group_by(ProductCode) %>%
+  summarise(Total_Sale = sum(SalesQuantity))
+
+
+data_for_clustering_product <- Total_sale_wo_promo_product$Total_Sale
+
+gmm_result_product <- Mclust(data_for_clustering_product, G = 3)
+
+cluster_labels_product <- gmm_result_product$classification
+
+Total_sale_wo_promo_product$Cluster_Label <- cluster_labels_product
+
+cluster_means_product <- Total_sale_wo_promo_product %>%
+  group_by(Cluster_Label) %>%
+  summarise(Avg_Total_Sale = mean(Total_Sale))
+
+threshold_fast_product <- cluster_means_product$Avg_Total_Sale[3]
+threshold_slow_product <- cluster_means_product$Avg_Total_Sale[1]
+
+Total_sale_wo_promo_product$Product_Category <- ifelse(Total_sale_wo_promo_product$Total_Sale >= threshold_fast_product, "Fast Product",
+                                               ifelse(Total_sale_wo_promo_product$Total_Sale >= threshold_slow_product, "Medium Product", "Slow Product"))
+
+#Lets use t-test becuase our sample not big enough 
+
+fast_products_prom <- Total_sale_Product_prom[Total_sale_Product_prom$Product_Category == "Fast Product", ]
+fast_products_wo_prom <- Total_sale_wo_promo_product[Total_sale_wo_promo_product$Product_Category == "Fast Product", ]
+
+fast_products_prom$Average_Daily_Sales <- fast_products_prom$Total_Sale / length(unique(promotions$Date))
+fast_products_wo_prom$Average_Daily_Sales <- fast_products_wo_prom$Total_Sale / length(unique(my_data_wo_promo$Date))
+
+t_test_result1 <- t.test(fast_products_prom$Average_Daily_Sales, fast_products_wo_prom$Average_Daily_Sales,alternative = "greater")
+
+if (t_test_result1$p.value < 0.05) {
+  cat("We reject the null hypothesis at this confidence interval; therefore, we can conclude that promotions do not have a significant impact on fast products during the promotional period.")
+  
+}else cat("We fail to reject the null hypothesis at this confidence interval; therefore, we can conclude that promotions does not impact the sales quantity of fast products during the promotional period.")
+
+
+```
+
+
+
+Now apply for slow products
+
+```{r}
+#Lets use t-test becuase our sample not big enough 
+Slow_products_prom <- Total_sale_Product_prom[Total_sale_Product_prom$Product_Category == "Slow Product", ]
+Slow_products_wo_prom <- Total_sale_wo_promo_product[Total_sale_wo_promo_product$Product_Category == "Slow Product", ]
+
+Slow_products_prom$Average_Daily_Sales <- Slow_products_prom$Total_Sale / length(unique(promotions$Date))
+Slow_products_wo_prom$Average_Daily_Sales <- Slow_products_wo_prom$Total_Sale / length(unique(my_data_wo_promo$Date))
+
+t_test_result3 <- t.test(Slow_products_prom$Average_Daily_Sales, Slow_products_wo_prom$Average_Daily_Sales,alternative = "greater")
+
+if (t_test_result3$p.value < 0.05) {
+  cat("We reject the null hypothesis at this confidence interval; therefore, we can conclude that promotions do not have a significant impact on slow products during the promotional period.")
+  
+}else cat("We fail to reject the null hypothesis at this confidence interval; therefore, we can conclude that promotions positively impact the sales quantity of slow products during the promotional period.")
+```
+
+### G 
+Let's apply the process we did in the previous part (F) on the stores this time.
+```{r message=FALSE, warning=FALSE}
+Total_sale_Store_prom <- promotions %>%
+  group_by(StoreCode) %>%
+  summarise(Total_Sale = sum(SalesQuantity))
+
+
+data_for_clustering_Store <- Total_sale_Store_prom$Total_Sale
+
+gmm_result_Store <- Mclust(data_for_clustering_Store, G = 3)
+
+cluster_labels_Store <- gmm_result_Store$classification
+
+Total_sale_Store_prom$Cluster_Label <- cluster_labels_Store
+
+cluster_means_Store <- Total_sale_Store_prom %>%
+  group_by(Cluster_Label) %>%
+  summarise(Avg_Total_Sale = mean(Total_Sale))
+
+threshold_fast_Store <- cluster_means_Store$Avg_Total_Sale[3]
+threshold_slow_Store <- cluster_means_Store$Avg_Total_Sale[1]
+
+Total_sale_Store_prom$Store_Category <- ifelse(Total_sale_Store_prom$Total_Sale >= threshold_fast_Store, "Fast Store",
+                                               ifelse(Total_sale_Store_prom$Total_Sale >= threshold_slow_Store, "Medium Store", "Slow Store"))
+
+# Lets observe the with out promotions after we can use Hypothesis test 
+
+Total_sale_wo_Store <- my_data_wo_promo %>%
+  group_by(StoreCode) %>%
+  summarise(Total_Sale = sum(SalesQuantity))
+
+
+data_for_clustering_Store <- Total_sale_wo_Store$Total_Sale
+
+n_init <- 10^4  
+gmm_result_Store <- Mclust(data_for_clustering_Store, G = 3)
+
+cluster_labels_Store <- gmm_result_Store$classification
+
+Total_sale_wo_Store$Cluster_Label <- cluster_labels_Store
+
+cluster_means_Store <- Total_sale_wo_Store %>%
+  group_by(Cluster_Label) %>%
+  summarise(Avg_Total_Sale = mean(Total_Sale))
+
+threshold_fast_Store <- cluster_means_Store$Avg_Total_Sale[3]
+threshold_slow_Store <- cluster_means_Store$Avg_Total_Sale[1]
+
+Total_sale_wo_Store$Store_Category <- ifelse(Total_sale_wo_Store$Total_Sale >= threshold_fast_Store, "Fast Store",
+                                               ifelse(Total_sale_wo_Store$Total_Sale >= threshold_slow_Store, "Medium Store", "Slow Store"))
+
+#Lets use t-test becuase our sample not big enough 
+
+fast_Stores_prom <- Total_sale_Store_prom[Total_sale_Store_prom$Store_Category == "Fast Store", ]
+fast_Stores_wo_prom <- Total_sale_wo_Store[Total_sale_wo_Store$Store_Category == "Fast Store", ]
+
+fast_Stores_prom$Average_Daily_Sales <- fast_Stores_prom$Total_Sale / length(unique(promotions$Date))
+fast_Stores_wo_prom$Average_Daily_Sales <- fast_Stores_wo_prom$Total_Sale / length(unique(my_data_wo_promo$Date))
+
+t_test_result2 <- t.test(fast_Stores_prom$Average_Daily_Sales, fast_Stores_wo_prom$Average_Daily_Sales,alternative = "greater")
+
+print(if (t_test_result2$p.value < 0.05) {
+  cat("We reject the null hypothesis at this confidence interval; therefore, we can conclude that promotions do not have a significant impact on fast Stores during the promotional period.")
+  
+}else cat("We fail to reject the null hypothesis at this confidence interval; therefore, we can conclude that promotions positively impact the sales quantity of fast Stores during the promotional period."))
+
+```
+
+For Slow Stores
+```{r}
+Slow_Stores_prom <- Total_sale_Store_prom[Total_sale_Store_prom$Store_Category == "Slow Store", ]
+Slow_Stores_wo_prom <- Total_sale_wo_Store[Total_sale_wo_Store$Store_Category == "Slow Store", ]
+
+Slow_Stores_prom$Average_Daily_Sales <- Slow_Stores_prom$Total_Sale / length(unique(promotions$Date))
+Slow_Stores_wo_prom$Average_Daily_Sales <- Slow_Stores_wo_prom$Total_Sale / length(unique(my_data_wo_promo$Date))
+
+t_test_result4 <- t.test(Slow_Stores_prom$Average_Daily_Sales, Slow_Stores_wo_prom$Average_Daily_Sales,alternative = "greater")
+
+print(if (t_test_result4$p.value < 0.05) {
+  cat("We reject the null hypothesis at this confidence interval; therefore, we can conclude that promotions do not have a significant impact on slow Stores during the promotional period.")
+  
+}else cat("We fail to reject the null hypothesis at this confidence interval; therefore, we can conclude that promotions positively impact the sales quantity of slow Stores during the promotional period."))
+
+```
+
+
+## Part B 
+
+### MODEL 1
+
+```{r message=FALSE, warning=FALSE}
+
+set.seed(111)
+
+
+shuffled_promotions <-promotions[sample(nrow(promotions)), ]
+
+first_50000_rows <- head(shuffled_promotions, 50000)
+
+train_ratio <- 0.8
+train_size <- floor(nrow(first_50000_rows) * train_ratio)
+
+train_data <- first_50000_rows %>% slice(1:train_size)
+test_data <- first_50000_rows %>% slice((train_size + 1):nrow(first_50000_rows))
+
+model <- lm(SalesQuantity ~ as.Date(Date) + as.factor(StoreCode) + as.factor(ProductCode), data = train_data)
+
+start_date <- as.Date("2015-09-01")
+end_date <- as.Date("2015-09-06")
+promo5 <- my_second_task %>% 
+  filter(Date >= start_date & Date <= end_date) %>% 
+  group_by(Date, StoreCode,ProductCode,SalesQuantity)
+
+stores <- unique(first_50000_rows$StoreCode)
+products <- unique(train_data$ProductCode)  
+predictions_df <- expand.grid(Date = seq(start_date, end_date, by = "1 days"),
+                              StoreCode = as.factor(stores), 
+                              ProductCode = as.factor(products))
+
+predictions_df$Predicted_Sale <- predict(model, newdata = predictions_df)
+
+promo5$ProductCode <- factor(promo5$ProductCode, levels = levels(predictions_df$ProductCode))
+predicted_values <- predict(model, newdata = promo5)
+
+
+existing_store_product_codes <- first_50000_rows %>%
+  distinct(StoreCode, ProductCode)
+promo5$StoreCode <- as.factor(promo5$StoreCode)
+promo5 <- left_join(promo5, predictions_df , by = c("Date", "StoreCode", "ProductCode"))
+promo5 <- na.omit(promo5)
+print(promo5)
+
+
+prediction_errors <- promo5$SalesQuantity - promo5$Predicted_Sale
+ 
+mean_sales_quantity <- mean(promo5$SalesQuantity)
+
+actual_values <- promo5$SalesQuantity
+predicted_values <- promo5$Predicted_Sale
+
+# RMSE hesaplaması
+
+rmse <- function(actual, predicted) {
+  sqrt(mean((actual - predicted)^2))
+}
+
+rmse_value <- rmse(actual_values, predicted_values)
+# SSres
+
+ssres_value <- sum((actual_values - predicted_values)^2)
+
+# R^2 
+total_sum_squares <- sum((promo5$SalesQuantity - mean(promo5$SalesQuantity))^2)
+residual_sum_squares <- sum((promo5$SalesQuantity - promo5$Predicted_Sale)^2)
+
+# R-kare hesaplama
+r_squared <- 1 - (residual_sum_squares / total_sum_squares)
+
+# AIC 
+n <- nrow(promo5)
+k <- length(coefficients(model)) - 1
+
+AIC_value <- n * log(residual_sum_squares/n) + 2 * k
+
+
+cat("R^2:", format(r_squared, digits = 4), "\n",
+    "RMSE:", format(rmse_value, digits = 4), "\n",
+    "SSRES:", format(ssres_value, digits = 4), "\n",
+    "AIC:", AIC_value)
+
+```
+### MODEL 2
+
+```{r message=FALSE, warning=FALSE}
+set.seed(111)
+
+promotions <- rbind(promo1,promo2,promo3,promo4)
+
+promotions$Day_of_Week <- weekdays(as.Date(promotions$Date))
+
+shuffled_promotions <- promotions[sample(nrow(promotions)), ]
+first_50000_rows <- head(shuffled_promotions, 50000)
+
+train_ratio <- 0.8
+train_size <- floor(nrow(first_50000_rows) * train_ratio)
+train_data <- first_50000_rows %>% slice(1:train_size)
+test_data <- first_50000_rows %>% slice((train_size + 1):nrow(first_50000_rows))
+
+train_data$Day_of_Week <- weekdays(as.Date(train_data$Date))
+test_data$Day_of_Week <- weekdays(as.Date(test_data$Date))
+
+gbm_model <- gbm(SalesQuantity ~ as.factor(Day_of_Week) + as.factor(StoreCode) + as.factor(ProductCode),
+                 data = train_data, n.trees = 500, verbose = TRUE, distribution = "gaussian")
+
+
+start_date <- as.Date("2015-09-01")
+end_date <- as.Date("2015-09-06")
+
+
+dates_for_predictions <- seq(start_date, end_date, by = "1 day")
+stores <- unique(first_50000_rows$StoreCode)
+products <- unique(train_data$ProductCode)  
+predictions_df <- expand.grid(Date = dates_for_predictions,
+                              StoreCode = stores, 
+                              ProductCode = products)
+
+predictions_df$Day_of_Week <- weekdays(as.Date(predictions_df$Date))
+
+
+predictions_df$Predicted_Sale <- predict(gbm_model, newdata = predictions_df, n.trees = 500)
+
+my_second_task$Day_of_Week <- weekdays(as.Date(my_second_task$Date))
+
+promo5 <- my_second_task %>% 
+  filter(Date >= start_date & Date <= end_date) %>% 
+  group_by(Date, StoreCode, ProductCode, SalesQuantity) %>%
+  left_join(predictions_df, by = c("Day_of_Week", "StoreCode", "ProductCode","Date"))
+promo5 <- promo5 %>% 
+  group_by(Date = cut(Date, breaks = "6 days"),StoreCode, ProductCode) %>%
+  summarise(Six_Days_Sales_Quantity = sum(SalesQuantity), Six_Days_Predicted_Sale = sum(Predicted_Sale))
+
+promo5 <- na.omit(promo5)
+
+# Hata metriklerinin hesaplanması
+actual_values <- promo5$Six_Days_Sales_Quantity
+predicted_values <- promo5$Six_Days_Predicted_Sale
+
+# RMSE hesaplaması
+rmse_value <- sqrt(mean((actual_values - predicted_values)^2))
+
+# SSRES hesaplaması
+ssres_value <- sum((actual_values - predicted_values)^2)
+
+# R^2 hesaplaması
+total_sum_squares <- sum((promo5$Six_Days_Sales_Quantity - mean(promo5$Six_Days_Sales_Quantity))^2)
+residual_sum_squares <- sum((promo5$Six_Days_Predicted_Sale - promo5$Six_Days_Sales_Quantity)^2)
+r_squared <- 1 - residual_sum_squares / total_sum_squares
+
+# Log-likelihood hesaplaması
+log_likelihood <- sum(dnorm(promo5$Six_Days_Sales_Quantity, mean = promo5$Six_Days_Predicted_Sale,
+                            sd = sqrt(residual_sum_squares/nrow(promo5))))
+
+# AIC hesaplaması
+n <- nrow(promo5)
+k <- length(coefficients(gbm_model))
+
+AIC_value <- n * log(residual_sum_squares/n) + 2 * k
+
+cat("R^2:", format(r_squared, digits = 4), "\n",
+    "Log-likelihood:", log_likelihood, "\n",
+    "RMSE:", format(rmse_value, digits = 4), "\n",
+    "SSRES:", format(ssres_value, digits = 4), "\n",
+    "AIC:", format(AIC_value, digits = 4))
+
+```
+
+
+## Bonnus
+
+```{r}
+before1_start<- as.Date("2015-02-03")
+before1_finish <- as.Date("2015-02-09")
+
+before2_start <- as.Date("2015-03-08")
+before2_finish <- as.Date("2015-03-14")
+
+before3_start <- as.Date("2015-05-17")
+before3_finish <- as.Date("2015-05-23")
+
+before4_start <- as.Date("2015-06-14")
+before4_finish <- as.Date("2015-06-20")
+
+before_promotion<- my_data_task1 %>%
+  filter(Date >= before1_start & Date <= before1_finish |
+         Date >= before2_start & Date <= before2_finish |
+         Date >= before3_start & Date <= before3_finish |
+         Date >= before4_start & Date <= before4_finish) %>%
+  group_by(ProductCode, Date, StoreCode)
+# Which one is smaller 0 
+before_promotion_returns<- before_promotion %>%
+  filter(SalesQuantity < 0)
+
+#Creating new set 
+after1_start <- as.Date("2015-02-18")
+after1_finish <- as.Date("2015-02-24")
+
+after2_start <- as.Date("2015-03-23")
+after2_finish <- as.Date("2015-03-29")
+
+after3_start <- as.Date("2015-06-2")
+after3_finish <- as.Date("2015-06-08")
+
+after4_start <- as.Date("2015-06-29")
+after4_finish <- as.Date("2015-07-05")
+
+after_promotion <- my_data_task1 %>%
+  filter(Date >= after1_start & Date <= after1_finish |
+         Date >= after2_start & Date <= after2_finish |
+         Date >= after3_start & Date <= after3_finish |
+         Date >= after4_start & Date <= after4_finish) %>%
+  group_by(ProductCode, Date, StoreCode)
+
+# Which one is smaller 0 
+after_promotion_returns <- after_promotion%>%
+  filter(SalesQuantity < 0)
+
+# I will conduct a two-sample hypothesis test and analyze the daily averages.
+
+result <- t.test(after_promotion_returns$SalesQuantity, before_promotion_returns$SalesQuantity, alternative = "two.sided")
+result
+```
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
