@@ -11,34 +11,34 @@ if (!require(plotly)) install.packages("plotly") ; library(plotly)
 if (!require(shinydashboard)) install.packages("shinydashboard") ; library(shinydashboard)
 
 
-saymanlık_listesi <- read.xlsx("~/Desktop/saymalık_listesi.xlsx", sheet = 1)
-veri <- read.xlsx("~/Desktop/hmbdat.xlsx", sheet = 1, startRow = 2)
+sl <- read.xlsx("~/Desktop/-.xlsx", sheet = 1)
+veri <- read.xlsx("~/Desktop/-.xlsx", sheet = 1, startRow = 2)
 
-colnames(veri)[c(13,14,15,18)] <- c("Üst.Birim.Kodu.Kadro", "İl.Adı.Kadro", "Saymanlık.Kodu.Birim.Adı.Kadro","Unvan.Kodu.Ve.Adı.Kadro")
-
-
-veri$SAYMANLIK.KODU <- gsub(".*?(\\d+).*", "\\1", veri$UNVAN.KODU.VE.ADI)
+colnames(veri)[c(13,14,15,18)] <- c("a", "b", "c","d")
 
 
+veri$? <- gsub(".*?(\\d+).*", "\\1", veri$?)
 
 
-veri$SAYMANLIK.KODU<- as.numeric(veri$SAYMANLIK.KODU)
+
+
+veri$?<- as.numeric(veri$?)
 
 
 # Verideki gereksiz dolu olan satırları NA yaptık "-" ve "YOK" ları daha temiz çalışmak için
-unique(veri$`TALEP.EDİLEN.SAYMANLIK.KODU.(Görev.yeri.değişikliği.talebi.var.ise)`)
-veri[,"TALEP.EDİLEN.SAYMANLIK.KODU.(Görev.yeri.değişikliği.talebi.var.ise)"][veri[,"TALEP.EDİLEN.SAYMANLIK.KODU.(Görev.yeri.değişikliği.talebi.var.ise)"] %in% c("-", "YOK")] <- NA
-veri[,"AYLIKSIZ.İZİN.AÇIKLAMA"][veri[,"AYLIKSIZ.İZİN.AÇIKLAMA"] %in% c("-", "YOK")] <- NA
-veri[,"AYLIKSIZ.İZİN.BAŞLANGIÇ.TARİHİ"][veri[,"AYLIKSIZ.İZİN.BAŞLANGIÇ.TARİHİ"] %in% c("-", "YOK")] <- NA
-veri[,"AYLIKSIZ.İZİN.BİTİŞ.TARİHİ"][veri[,"AYLIKSIZ.İZİN.BİTİŞ.TARİHİ"] %in% c("-", "YOK")] <- NA
-veri[,"TALEP.EDİLEN.SAYMANLIK.KODU.(Görev.yeri.değişikliği.talebi.var.ise)"] <- gsub("[^0-9]", "", veri[,"TALEP.EDİLEN.SAYMANLIK.KODU.(Görev.yeri.değişikliği.talebi.var.ise)"])
+unique(veri$`T?`)
+veri[,"T?"][veri[,"?"] %in% c("-", "YOK")] <- NA
+veri[,"?"][veri[,"?"] %in% c("-", "YOK")] <- NA
+veri[,"?"][veri[,"?"] %in% c("-", "YOK")] <- NA
+veri[,"data$colname"][veri[,"data$colname"] %in% c("-", "YOK")] <- NA
+veri[,"data$colname(data$colname)"] <- gsub("[^0-9]", "", veri[,"data$colname"])
 
 # Burda hata olursa veriye dönük yeni işlemler gerekir toplanması ve sanala geçilişinde.
-sum(is.na(veri[,"TALEP.EDİLEN.SAYMANLIK.KODU.(Görev.yeri.değişikliği.talebi.var.ise)"]))
-veri[,"TALEP.EDİLEN.SAYMANLIK.KODU.(Görev.yeri.değişikliği.talebi.var.ise)"] <- as.numeric(veri[,"TALEP.EDİLEN.SAYMANLIK.KODU.(Görev.yeri.değişikliği.talebi.var.ise)"])
-sum(is.na(veri[,"TALEP.EDİLEN.SAYMANLIK.KODU.(Görev.yeri.değişikliği.talebi.var.ise)"]))
+sum(is.na(veri[,"data$colname"]))
+veri[,"data$colname"] <- as.numeric(veri[,"data$colname"])
+sum(is.na(veri[,"data$colname"]))
 
-saymanlık_listesi$SAYMANLIK.KODU <- as.numeric(saymanlık_listesi$SAYMANLIK.KODU)
+data <- as.numeric(data$colname)
 
 # Verinin kirliliğinden dolayı ve diğer doğru yerleri bozmamak adına talep edilen bölge için yeni veri oluşturuyoruz.
 # Birleştirme işlemini gerçekleştiriyoruz
@@ -46,17 +46,17 @@ veri2 <- data.frame()
 
 # İşlemi gerçekleştiriyoruz
 for (i in 1:nrow(veri)) {
-  talep_saymanlik <- veri[i, "TALEP.EDİLEN.SAYMANLIK.KODU.(Görev.yeri.değişikliği.talebi.var.ise)"]
+  data <- veri[i, "TALEP.EDİLEN.SAYMANLIK.KODU.(Görev.yeri.değişikliği.talebi.var.ise)"]
   
-  if (is.na(talep_saymanlik)) {
-    birim_adi <- NA
-  } else if (talep_saymanlik %in% saymanlık_listesi$SAYMANLIK.KODU) {
-    birim_adi <- saymanlık_listesi$BİRİM.ADI[match(talep_saymanlik, saymanlık_listesi$SAYMANLIK.KODU)]
+  if (is.na(data)) {
+    data <- NA
+  } else if (data %in% data$data) {
+    birim_adi <- data$data, data$data)]
   } else {
     birim_adi <- "BİLİNMİYOR"
   }
   
-  veri2 <- rbind(veri2, data.frame(TALEP = talep_saymanlik, BİRİM.ADI = birim_adi))
+  veri2 <- rbind(veri2, data.frame(TALEP = data, BİRİM.ADI = data))
 }
 
 # Talepli verileri oluşturduk
@@ -65,17 +65,17 @@ talepli_veri <- cbind(veri,veri2)
 
 
 talepli_veri <- talepli_veri %>%
-  rename(Talep.Edilen.Birim.Adı = BİRİM.ADI)
+  rename(data = data)
 
 
-veri$HİZMET.YILI[veri$HİZMET.YILI == "1 AY" | veri$HİZMET.YILI == "-" ] <- 0
-veri$HİZMET.YILI <- as.numeric(veri$HİZMET.YILI)
-veri$AYLIKSIZ.İZİN.AÇIKLAMA[veri$AYLIKSIZ.İZİN.AÇIKLAMA == "YOK" | veri$AYLIKSIZ.İZİN.AÇIKLAMA =="YOK " | veri$AYLIKSIZ.İZİN.AÇIKLAMA == "-"  ] <- NA
+veri$data[veri$data == "1 AY" | veri$data == "-" ] <- 0
+veri$data <- as.numeric(veri$data)
+veri$data[veri$data == "YOK" | veri$data =="YOK " | veri$data == "-"  ] <- NA
 
 
-talepli_veri$HİZMET.YILI[talepli_veri$HİZMET.YILI == "1 AY" | talepli_veri$HİZMET.YILI == "-" ] <- 0
-talepli_veri$HİZMET.YILI <- as.numeric(talepli_veri$HİZMET.YILI)
-talepli_veri$AYLIKSIZ.İZİN.AÇIKLAMA[talepli_veri$AYLIKSIZ.İZİN.AÇIKLAMA == "YOK" | talepli_veri$AYLIKSIZ.İZİN.AÇIKLAMA =="YOK " | talepli_veri$AYLIKSIZ.İZİN.AÇIKLAMA == "-"  ] <- NA
+talepli_veri$data[talepli_veri$data == "1 AY" | talepli_veri$data == "-" ] <- 0
+talepli_veri$data <- as.numeric(talepli_veri$data)
+talepli_veri$data[talepli_veri$data == "YOK" | talepli_veri$data =="YOK " | talepli_veri$data == "-"  ] <- NA
 
 
 # APP 
@@ -85,11 +85,11 @@ ui <- dashboardPage(
   dashboardSidebar(
     sidebarMenu(
       menuItem("Kişi Sayıları ve İstatistikler", tabName = "istatistikler", icon = icon("users")),
-      menuItem("Tayin Talep Sorgusu", tabName = "talepListesi", icon = icon("search")),
-      menuItem("Görev Tipleri", tabName = "gorevTipleri", icon = icon("search")),
-      menuItem("Hizmet Yılı", tabName = "hizmetYili", icon = icon("search")),
+      menuItem("Tayin Talep Sorgusu", tabName = "data", icon = icon("search")),
+      menuItem("data", tabName = "gorevTipleri", icon = icon("search")),
+      menuItem("Hizmet Yılı", tabName = "data", icon = icon("search")),
       menuItem("Genel Sorgu", tabName = "genelsorgu", icon = icon("search")),
-      menuItem("Ücretsiz İzin Sorgusu", tabName = "ucretsizIzinSorgusu", icon = icon("search")) 
+      menuItem("data", tabName = "data", icon = icon("search")) 
     )
   ),
   dashboardBody(
@@ -137,10 +137,10 @@ ui <- dashboardPage(
         )
       ),
       tabItem(
-        tabName = "talepListesi",
+        tabName = "data",
         fluidPage(
-          selectInput("ilSecimiTalep", "İl Seçiniz:", choices = c("Tüm İller", unique(talepli_veri$İL.ADI))),
-          selectInput("yasFiltreSecimiTalep", "62 Yaş ve Üstü Filtreleme:", choices = c("açık", "kapalı"), selected = "kapalı"),
+          selectInput("data", "İl data:", choices = c("Tüm İller", unique(talepli_veri$İL.ADI))),
+          selectInput("data", "62 Yaş ve Üstü Filtreleme:", choices = c("açık", "kapalı"), selected = "kapalı"),
           verbatimTextOutput("sayi"),
           DTOutput("datatable_output")
         )
@@ -150,7 +150,7 @@ ui <- dashboardPage(
         fluidPage(
           selectInput("ilSecimiGorev", "İl Seçiniz:", choices = c("Tüm İller", unique(talepli_veri$İL.ADI))),
           selectInput("gorevTipi", "Görev Tipi Seçiniz:", choices = unique(talepli_veri$TİPİ)),
-          selectInput("yasFiltreSecimiGorev", "62 Yaş ve Üstü Filtreleme:", choices = c("açık", "kapalı"), selected = "kapalı"),
+          selectInput("data", "62 Yaş ve Üstü Filtreleme:", choices = c("açık", "kapalı"), selected = "kapalı"),
           verbatimTextOutput("gorevSayi"),
           DTOutput("gorev_tipleri")
         )
@@ -158,7 +158,7 @@ ui <- dashboardPage(
       tabItem(
         tabName = "hizmetYili",
         fluidPage(
-          selectInput("hizmetYiliSecimi", "Hizmet Yılı Seçiniz:", choices = unique(talepli_veri$HİZMET.YILI)),
+          selectInput("data", "Hizmet Yılı Seçiniz:", choices = unique(talepli_veri$HİZMET.YILI)),
           selectInput("ilSecimiHizmet", "İl Seçiniz:", choices = c("Tüm İller", unique(talepli_veri$İL.ADI))),
           selectInput("unvanSecimiHizmet", "Ünvan Seçiniz:", choices = c("Tüm Ünvanlar", unique(talepli_veri$UNVAN.KODU.VE.ADI))),
           selectInput("yasFiltreSecimiHizmet", "62 Yaş ve Üstü Filtreleme:", choices = c("açık", "kapalı"), selected = "kapalı"),
@@ -196,10 +196,10 @@ ui <- dashboardPage(
       tabItem(
         tabName = "ucretsizIzinSorgusu",
         fluidPage(
-          selectInput("izinAciklamaSecimi", "Ücretsiz İzin Açıklama Seçiniz:", choices = c("Tüm Açıklamalar", "Var", "Yok"))),
+          selectInput("data", "Ücretsiz İzin Açıklama Seçiniz:", choices = c("Tüm Açıklamalar", "Var", "Yok"))),
         selectInput("ilSecimiIzin", "İl Seçiniz:", choices = c("Tüm İller", unique(veri$İL.ADI))),
-        selectInput("yasFiltreSecimiIzin", "62 Yaş ve Üstü Filtreleme:", choices = c("açık", "kapalı"), selected = "kapalı"),
-        DTOutput("ucretsizIzinTable")
+        selectInput("data", "62 Yaş ve Üstü Filtreleme:", choices = c("açık", "kapalı"), selected = "kapalı"),
+        DTOutput("data")
       )
     )
   )
@@ -292,8 +292,8 @@ server <- function(input, output, session) {
     if (!is.null(input$ilSecimi) && input$ilSecimi != "Tüm İller") {
       filtreliVeri <- filtreliVeri %>% filter(İL.ADI == input$ilSecimi)
     }
-    if (!is.null(input$unvanSecimi) && input$unvanSecimi != "Tüm Ünvanlar") {
-      filtreliVeri <- filtreliVeri %>% filter(UNVAN.KODU.VE.ADI == input$unvanSecimi)
+    if (!is.null(input$data) && input$data != "Tüm Ünvanlar") {
+      filtreliVeri <- filtreliVeri %>% filter(data == input$data)
     }
     return(filtreliVeri)
   })
@@ -301,8 +301,8 @@ server <- function(input, output, session) {
   # İldeki toplam çalışan sayısı
   output$ilCalisanSayisi <- renderPrint({
     filtreliData <- secilenİl()
-    if (!is.null(input$ilSecimi) && input$ilSecimi != "Tüm İller") {
-      ilCalisanSayisi <- length(filtreliData$UNVAN.KODU.VE.ADI)
+    if (!is.null(input$data) && input$ilSecimi != "Tüm İller") {
+      ilCalisanSayisi <- length(filtreliData$data)
       paste("Seçilen İldeki Toplam Çalışan Sayısı:", ilCalisanSayisi)
     } else {
       "Lütfen bir il seçin."
@@ -312,7 +312,7 @@ server <- function(input, output, session) {
   # Kişi sayılarını görüntüleme
   output$kisiSayilari <- renderPrint({
     filtreliData <- secilenVeri()
-    paste("Seçilen il ve ünvandaki Kişi Sayısı:", length(filtreliData$UNVAN.KODU.VE.ADI))
+    paste("Seçilen il ve ünvandaki Kişi Sayısı:", length(filtreliData$data))
   })
   
   # 62 yaşından büyük kişi sayılarını görüntüleme
@@ -320,8 +320,8 @@ server <- function(input, output, session) {
     filtreliData <- secilenVeri()
     today <- Sys.Date()
     buyuk62Data <- filtreliData %>%
-      mutate(DOĞUM.TARİHİ = as.Date(DOĞUM.TARİHİ, format = "%d.%m.%Y")) %>%
-      mutate(Yas = as.numeric(difftime(today, DOĞUM.TARİHİ, units = "days")) / 365.25) %>%
+      mutate(data = as.Date(data, format = "%d.%m.%Y")) %>%
+      mutate(Yas = as.numeric(difftime(today, data, units = "days")) / 365.25) %>%
       filter(Yas > 62)
     paste("62 Yaşından Büyük Kişi Sayısı:", nrow(buyuk62Data))
   })
@@ -329,37 +329,37 @@ server <- function(input, output, session) {
   output$cinsiyetSayilari <- renderPrint({
     filtreliData <- secilenVeri()
     
-    kadınSayisi <- sum(filtreliData$CİNSİYETİ %in% c("Kadın", "KADIN", "BAYAN", "KADIN "))
-    erkekSayisi <- sum(filtreliData$CİNSİYETİ %in% c("ERKEK", "Erkek", "Erkek  ", "YAPTI"))
+    kadınSayisi <- sum(filtreliData$data %in% c("Kadın", "KADIN", "BAYAN", "KADIN "))
+    erkekSayisi <- sum(filtreliData$data %in% c("ERKEK", "Erkek", "Erkek  ", "YAPTI"))
     
-    paste("Seçilen ünvan ve ildeki kadın sayısı:", kadınSayisi,
-          "Seçilen ünvan ve ildeki erkek sayısı:", erkekSayisi)
+    paste("Seçilen ünvan ve ildeki kadın sayısı:", data,
+          "Seçilen ünvan ve ildeki erkek sayısı:", data)
   })
   # Ünvan toplamı
-  output$unvanKisiSayisi <- renderPrint({
+  output$data <- renderPrint({
     filtreliData <- secilenIlUnvan()
-    unvanKisiSayisi <- length(filtreliData$UNVAN.KODU.VE.ADI)
+    unvanKisiSayisi <- length(filtreliData$data)
     paste("Seçilen ünvandaki toplam kişi sayısı:", unvanKisiSayisi)
   })
   
   
   # Tayin Talep Sorgusu Sayfası
   filtered_data_talep <- reactive({
-    if (input$ilSecimiTalep == "Tüm İller") {
+    if (input$data == "Tüm İller") {
       talepli_veri %>% 
-        filter(!is.na(TALEP) & grepl("^\\d+$", TALEP))
+        filter(!is.na(data) & grepl("^\\d+$", TALEP))
     } else {
       talepli_veri %>% 
-        filter(!is.na(TALEP) & grepl("^\\d+$", TALEP) & İL.ADI == input$ilSecimiTalep)
+        filter(!is.na(data) & grepl("^\\d+$", TALEP) & İL.ADI == input$data)
     }
   })
   
   filtered_data_talep_with_age_filter <- reactive({
-    if (input$yasFiltreSecimiTalep == "açık") {
+    if (input$data == "açık") {
       today <- Sys.Date()
       buyuk62Data <- filtered_data_talep() %>%
-        mutate(DOĞUM.TARİHİ = as.Date(DOĞUM.TARİHİ, format = "%d.%m.%Y")) %>%
-        mutate(Yas = as.numeric(difftime(today, DOĞUM.TARİHİ, units = "days")) / 365.25) %>%
+        mutate(DOĞUM.TARİHİ = as.Date(data, format = "%d.%m.%Y")) %>%
+        mutate(Yas = as.numeric(difftime(today, data, units = "days")) / 365.25) %>%
         filter(Yas >= 62)
       return(buyuk62Data)
     } else {
@@ -492,9 +492,9 @@ server <- function(input, output, session) {
     filtreliData <- veri
     
     if (input$izinAciklamaSecimi == "Var") {
-      filtreliData <- filtreliData[!is.na(filtreliData$AYLIKSIZ.İZİN.AÇIKLAMA) & filtreliData$AYLIKSIZ.İZİN.AÇIKLAMA != "", ]
+      filtreliData <- filtreliData[!is.na(filtreliData$data) & filtreliData$data != "", ]
     } else if (input$izinAciklamaSecimi == "Yok") {
-      filtreliData <- filtreliData[is.na(filtreliData$AYLIKSIZ.İZİN.AÇIKLAMA) | filtreliData$AYLIKSIZ.İZİN.AÇIKLAMA == "", ]
+      filtreliData <- filtreliData[is.na(filtreliData$data) | filtreliData$data == "", ]
     }
     
     if (input$ilSecimiIzin != "Tüm İller") {
