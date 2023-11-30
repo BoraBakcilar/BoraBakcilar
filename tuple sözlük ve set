@@ -1,0 +1,171 @@
+#Tuple(demet) Oluşturma
+
+# Kapsayıcıdırlar yani farklı türde data bulundurabilir
+# indexlenebilir index işlemleri yapılabilir
+# değiştirilemezler.
+
+t = ("bora","ata",2.1,3,7,1,["ali","metin","feyyaz",1903])
+t
+
+# tek elmanlı bir tuple() oluşturmak için ise t = ("elma",) sondaki , tuple yapar
+y = ("elma")
+y_tup = ("elma",)
+
+
+#Tuple işlemleri
+
+t 
+t[1]
+t[0:4]
+t[2] = 99
+
+
+# Sözlük oluşturma (Dictionary creating)
+
+sozluk = {"REG" : "Regresyon modeli",
+          "Loj" : "Logistic regression",
+          "CART": "Classification and Reg"}
+
+sozluk
+len(sozluk) #6 farklı şey olduğuna bakma 3 tane şey tanımladığından 3 sayar
+
+sozluk2 = {"REG" : ["RMSE",10],
+          "Loj" : ["MSE",20],
+          "CART": ["SSE",30]}
+
+# Sözlük işlemleri 
+
+sozluk2["REG"] # sözlükler sırasız olduğundan atanılan şey neyse öyle çağırmamız lazım 
+               # sözlük2[0] çalışmaz!
+
+sozluk2["Loj"][1] #içi listeden oluştuğundan elemanı böyle çağırabiliriz.
+
+# sözlük içine sözlük yazılabilir ve çağırım aynı şekilde içgüdüsel yolda yapılır.
+
+sozluk3 = {"REG" : {"RMSE": 10,
+                    "MSE" : 20,
+                    "SSE" : 30},
+           
+          "Loj" : {"RMSE": 10,
+                   "MSE" : 20,
+                    "SSE" : 30},
+          
+          "CART": {"RMSE": 10 ,
+                   "MSE" : 20,
+                              "SSE" : 30}}
+
+sozluk3["Loj"]["MSE"]
+ 
+# SÖZLÜKLERE ELEMAN EKLEME ÇIKARTMA 
+# Sözlükler key ve valuedan oluşur  "REG", "Loj","CART" bunlar keylerimiz 
+# bunlara karşılık gelenler ise bizim valuelarımız valuelar her türlü şey alabilir. (fonksiyon? bilgim yok daha)
+
+#Ekleme
+
+sozluk["GBM"] = "Gradiant Boosting Mac" # sozluk nesnesine eleman eklemek için bu yazım 
+sozluk
+
+# Değiştirmek için key değerleri yani elimizdeki örenkte "REG", "Loj","CART" (keylerimiz)
+sozluk2["REG"] = ["Bora",98]
+sozluk2
+
+# Key kısmına liste koyulamaz!.
+
+my_list = ["bora","ata","ergin","burcin"]
+sozluk[my_list] = ["sporcular"] # hata! liste olmaz
+
+#!!! Ancak tuple burda kullanılır (bora bunu sevdi :) ) 
+
+my_tupple = ("q","w","e","r")
+sozluk[my_tupple] = [3,5,7,"Reg"]
+sozluk
+
+
+# Setler ve oluşturma
+#1 sırasızdır, değeri eşsizdir, değiştirilebilir, farklı tipler barındırır. 
+
+s = set()
+
+# setleri istedğimiz şeyler ile oluşturabiliriz 
+
+# Listeli 
+listem = [1,2,3,"ata","bora"]
+s= set(listem)
+
+# Tupleli 
+
+s2 = set(my_tupple)
+
+ali = "topa_bakma_uzaya_git"
+s3 = set(ali)
+s3
+s2
+
+# Setler alfabeye göre sıralar ve 2 den daha fazla tekrar eden variable varsa tekilleştirir 
+
+l = ["ali","lütfen","git","uzaya","git","topa","bakma"]
+s4 = set(l)
+s4
+len(s4)
+l[0]
+s[0] # setler sırasız olduğundan indexlenemez
+
+# Setlerde eleman ekleme çıkartma
+
+listem2 = ["geleceği","yazanlar"]
+
+s5 = set(listem2)
+s5
+
+s5.add("ile")
+s5
+
+s5.add("gelecege_git") #element ekleme 
+s5
+
+s5.remove("ile")  # element kaldırma
+s5
+
+s5.remove("olmayan_sey") # sahip olunmayan bir elementi çıkartırsak hata verir alttaki iş görür
+s5.discard("olmayan_sey") # çıkartır ancak eğer yoksa hata vermeden koda devam eder 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
