@@ -1,0 +1,198 @@
+---
+title: "467 Project"
+author: "Bora Bakçılar 2290534"
+date: "2023-12-08"
+output: html_document
+---
+
+```{r libs}
+if (!require("MASS")) {install.packages("MASS")} ;library(MASS)
+if (!require("dbplyr")) {install.packages("dbplyr")} ;library(dbplyr)
+if (!require("readr")) {install.packages("readr")} ;library(readr)
+if (!require("AID")) {install.packages("AID")} ;library(AID)
+if (!require("Matrix")) {install.packages("Matrix")} ;library(Matrix)
+if (!require("geometry")) {install.packages("geometry")} ;library(geometry)
+if (!require("corrplot")) {install.packages("corrplot")} ; library(corrplot)
+if (!require("expm")) {install.packages("expm")} ; library(expm)
+if (!require("MVA")) {install.packages("MVA")} ; library(MVA)
+if (!require("ggplot2")) {install.packages("ggplot2")} ; library(ggplot2)
+if (!require("psych")) {install.packages("psych")} ; library(psych)
+library(tidyverse)
+
+
+```
+
+```{r importing}
+data <- read_csv("Desktop/STAT467/project/archive/data.csv")
+countries_iso_data <- read_csv("Desktop/STAT467/project/archive/countries_iso_data.csv")
+
+head(data)
+summary(data)
+typeof(data)
+
+```
+
+Özellik kontrolü ve dönüşümler
+
+```{r}
+# numeric ve numeric olmayan veri setlerimiz var şimdik en başta numeric değerimizde NA kontrolü yapalım 
+
+colSums(is.na(data))
+# 4 tane na değerimiz var bunları 
+
+# Bu na değerlerini doldurcaz. 
+
+fill_na_with_means <- function(df) {
+  for (col in names(df)) {
+    mean_val <- mean(df[[col]], na.rm = TRUE)
+    df[[col]][is.na(df[[col]])] <- mean_val
+  }
+  return(df)
+}
+
+# Fonksiyonu kullanarak NA değerleri doldur
+data_filled <- fill_na_with_means(data)
+colSums(is.na(data_filled))
+data_filled <- as.data.frame(data_filled)
+
+numeric_data <- data_filled %>% select_if(is.numeric)
+str(numeric_data)
+
+shapiro_matrix <- matrix(0,ncol = 2,nrow = ncol(numeric_data))
+colnames(shapiro_matrix) <- c("W", "p.value")
+rownames(shapiro_matrix) <- colnames(numeric_data)
+
+for (i in 1:ncol(numeric_data)) {
+  shapiro_results <- shapiro.test(numeric_data[,i])
+  shapiro_matrix[i, ] <- c(shapiro_results$statistic, shapiro_results$p.value)
+}
+
+non_normal_data<- shapiro_matrix[shapiro_matrix[, 2] < 0.05, ]
+print(non_normal_data)
+
+```
+
+```{r normalize etme}
+matching_columns <- intersect(colnames(data_filled), rownames(non_normal_data))
+
+normalize_cols <- matrix(0,nrow = nrow(data), ncol = nrow(non_normal_data))
+colnames(normalize_cols) <- rownames(non_normal_data)
+results <- list()
+
+for (col_index in matching_columns) {
+  results[[col_index]] <- boxcoxnc(data_filled[[col_index]])
+  data_filled[, col_index] <- results[[col_index]]$tf.data
+}
+
+# checking results 
+head(results)
+# We see one collumn are not applied boxcox trasnformation so lets try this with hand dirty in AVG_job_satis
+
+colSums(is.na(data))
+# We dont have Na in last collumn lets apply the boxcox
+
+data_filled$AVG_JOB_SATISFACTION <- boxcoxnc(data$AVG_JOB_SATISFACTION,lambda = seq(-3,10,by=0.0001))$tf.data
+# our  lambda.hat : 4.4939  is it acceptable? 
+```
+
+## EDA and others
+
+```{r}
+# Lets cont with EDA and eigenvalues and vectors 
+
+normal_numeric <- data_filled %>% select_if(is.numeric)
+normal_numeric
+
+cor_mat <- as_data_frame(cor(normal_numeric))
+
+eigen_mat <- eigen(cor_mat)
+eigenvalues <- eigen_mat$values
+eigenvectors <- eigen_mat$vectors
+
+# Görselleştirme 
+regline <- function(x, y, ...) {
+  points(x, y, ...)
+  fit <- lm(y ~ x)
+  abline(fit, col = "blue")
+}
+
+pairs(normal_numeric,labels = colnames(normal_numeric),panel = regline,gap = 0.5)
+
+
+
+pairs.panels(normal_numeric,method = "spearman",
+             hist.col = "lightblue",  # histogram renkleri
+             density = TRUE, 
+             ellipses = TRUE, 
+             cex.labels = 1.2,
+             main = "Scatterplot Matrix")
+
+
+
+```
+
+```{r outlier detect}
+
+ 
+ 
+ distances <- mahalanobis(normal_numeric, colMeans(normal_numeric), cov(normal_numeric))
+ squared_distances <- distances^2
+ 
+ chi_square_quantiles <- qchisq((1:length(squared_distances)) / length(squared_distances), df = ncol(normal_numeric))
+ plot(chi_square_quantiles, sort(squared_distances), xlab = "Quantiles", ylab = "Squared Distance", main = "Chi-Square Plot")
+ 
+ outliers <- which(squared_distances > quantile(squared_distances, 0.95))
+ data_wo_outliers <- normal_numeric[-outliers,]
+ 
+ print("Orginal mean:"); print(colMeans(normal_numeric))
+ 
+ print("No outlier mean:") ; print(colMeans(data_wo_outliers))
+ 
+ print("Orginal cov:");print(cov(normal_numeric))
+ 
+ print("No outlier cov:") ; print(cov(data_wo_outliers))
+
+ 
+
+# Artık outliersız verimizde var ve bu veri hem ülke isimli hem de sadece numerik olarak var 
+ 
+data_wo_outlier_Named <- data_wo_outliers
+
+data_wo_outlier_Named$COUNTRY <- data_filled$COUNTRY[match(data_wo_outliers$GENDER_PAY_GAP, data_filled$GENDER_PAY_GAP)]
+
+duplicated(data_wo_outlier_Named$COUNTRY)
+
+# duplicated olduğu için işlemi tekrardan yapmak gerekiyor bunun için eşlemeye çalışçağı stün, stünları bulmalıyız 
+
+find_unique_columns <- function(data) {
+  unique_columns <- character(0)  # Boş bir karakter vektörü oluştur
+
+  for (col in colnames(data)) {
+    if (length(unique(data[[col]])) == nrow(data)) {
+      unique_columns <- c(unique_columns, col)
+    }
+  }
+
+  return(unique_columns)
+}
+
+unique_columns <- find_unique_columns(data_wo_outliers)
+unique_columns
+
+# eşleşen sütunlardan 1 ine göre bakıldı daha fazla sütuna göre kıyaslamaya gerek yok zaten tek başına bütün satırları karşılıyor
+data_wo_outlier_Named$COUNTRY <- data_filled$COUNTRY[match(data_wo_outliers[[unique_columns[1]]],data_filled[[unique_columns[1]]])]
+
+duplicated(data_wo_outlier_Named$COUNTRY)
+# Ülkelere göre Rank atanabilir ama ne arıyoruz veri normalize edildi outlierlı ve outliersız şekilde eşleştirildi eigen ler bulundu korelasyon matrixine ve outliersız korelasyonlara bakılabilir outlierlar etkiliyor mu diye? Ranklere bakılır ve verimizin aslına ve korelasyonlara bakarak hipotezler kurulur. #outlierlı ve outliersızların da bu hipotezlere etkisi ölçülür (ama burdaki amaç ne olur?).#
+
+```
+
+
+
+
+
+
+
+
+
+
